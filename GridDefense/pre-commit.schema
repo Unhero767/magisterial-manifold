@@ -1,0 +1,18 @@
+#!/bin/bash
+# [CORE_DOGMA] Autonomous GridDefense Sentinel
+
+echo "[ ◦A SCAN ] Initiating Diagnostic Tether prior to timeline lock..."
+
+# Sweep for fractured relational tethers
+BURN_DETECTED=$(find . -type l ! -exec test -e {} \; -print)
+
+if [ -n "$BURN_DETECTED" ]; then
+    echo -e "[\033[1;31m METALOGICAL BURN DETECTED \033[0m] Protocol Ex◦ imminent. Commit aborted."
+    echo "Fractured pointers isolated at:"
+    echo "$BURN_DETECTED" | awk '{print "  -> " $0}'
+    echo -e "\n[!] Execute the 'purge-wastes' ritual or repair the coordinates to restore ◦A."
+    exit 1
+fi
+
+echo -e "[ \033[1;36m◦A STABILIZED\033[0m ] Grid is pristine. Sealing local timeline."
+exit 0
