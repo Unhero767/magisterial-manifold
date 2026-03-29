@@ -1,0 +1,9 @@
+{
+    "CORE": {
+        "consistency_a": 1.0,
+        "instability_ex": 0.0,
+        "tethers": [],
+        "entities": {},
+        "neighbors": []
+    }
+}
