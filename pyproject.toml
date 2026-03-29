@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "magisterial-manifold"
+version = "1.0.0"
+description = "A neuro-integrated MTP architecture."
+authors = [{name = "Kenneth Wayne Dallmier"}]
+dependencies = []
+
+[project.scripts]
+magisterium = "src.core.ml_cli:master_sync"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
