@@ -6,10 +6,12 @@ on:
   workflow_dispatch:
     inputs:
       purge_mode:
-        description: 'Enable active quarantine of Metalogical Burn?'
+        description: 'Enable active quarantine?'
         type: boolean
         default: false
-        required: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 🚀 Future-proofing the substrate
 
 jobs:
   resonance-check:
@@ -24,10 +26,10 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: 📜 Ingesting Magisterial Dependencies
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
       - name: 🕯️ Executing Terminal Ritual
         run: |
-          PURGE_FLAG=""
-          if [ "${{ github.event.inputs.purge_mode }}" == "true" ]; then
-            PURGE_FLAG="--purge"
-          fi
-          python3 src/core/ml_cli.py --define-sector Neon_Veil --protocol Luminous_Static $PURGE_FLAG
+          python3 src/core/ml_cli.py --define-sector Neon_Veil --protocol Luminous_Static
