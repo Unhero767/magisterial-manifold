@@ -1,0 +1,30 @@
+name: 🛡️ MTP Validation Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-mtp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Clone Manifold
+        uses: actions/checkout@v4
+
+      - name: 🐍 Initialize Python Environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: 📦 Install Magisterial Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Add colorama if your RuleEngine ritual logs require it
+          pip install colorama 
+
+      - name: 🧪 Execute MTP Resonance Test
+        run: |
+          # The RuleEngine uses inherent semantic richness to verify integrity
+          python3 test_mtp.py
