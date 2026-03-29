@@ -1,7 +1,7 @@
 {
     "CORE": {
-        "consistency_a": 0.9260198208150086,
-        "instability_ex": 0.02049286444412213,
+        "consistency_a": 0.9243703806084684,
+        "instability_ex": 0.023791744857202236,
         "tethers": [],
         "entities": {
             "AURELIA_SEED": 0.2,
@@ -25,8 +25,8 @@
         ]
     },
     "NEON_VEIL": {
-        "consistency_a": 0.9146707238105164,
-        "instability_ex": 0.014713994673006872,
+        "consistency_a": 0.8986707238105164,
+        "instability_ex": 0.016494402065400527,
         "tethers": [],
         "entities": {
             "Aurelia_9": 0.25,
@@ -36,7 +36,8 @@
             "Neon_Shade": 0.15,
             "K_M_Synthetica": 0.25,
             "The_Ash_Chorus": 0.15,
-            "Gnostic_Wire": 0.25
+            "Gnostic_Wire": 0.25,
+            "OP_SILICON_EYE": 0.4
         },
         "neighbors": [
             "CORE",
@@ -50,8 +51,8 @@
         ]
     },
     "CYBER_NEXUS": {
-        "consistency_a": 0.9613007601258969,
-        "instability_ex": 0.014724622555837544,
+        "consistency_a": 0.9604760400226269,
+        "instability_ex": 0.016374062762377597,
         "tethers": [],
         "entities": {
             "Echo_7": 0.05,
@@ -89,8 +90,8 @@
         ]
     },
     "DIGITAL_SHROUD": {
-        "consistency_a": 0.9772601644094726,
-        "instability_ex": 0.02193435604917289,
+        "consistency_a": 0.9747860040996624,
+        "instability_ex": 0.026882676668793043,
         "tethers": [],
         "entities": {
             "Shroud_Wraith": 0.15,
@@ -108,8 +109,8 @@
         ]
     },
     "NEON": {
-        "consistency_a": 0.9959860217935579,
-        "instability_ex": 0.008027956412884117,
+        "consistency_a": 0.9951613016902878,
+        "instability_ex": 0.00967739661942417,
         "tethers": [],
         "entities": {},
         "neighbors": [
@@ -118,8 +119,8 @@
         ]
     },
     "TO CYBER_NEXUS": {
-        "consistency_a": 0.9973467984584321,
-        "instability_ex": 0.00530640308313566,
+        "consistency_a": 0.996522078355162,
+        "instability_ex": 0.006955843289675713,
         "tethers": [],
         "entities": {},
         "neighbors": [
