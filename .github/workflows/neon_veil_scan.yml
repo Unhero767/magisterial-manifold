@@ -1,0 +1,33 @@
+name: 'Neon_Veil Sector Scan'
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      purge_mode:
+        description: 'Enable active quarantine of Metalogical Burn?'
+        type: boolean
+        default: false
+        required: false
+
+jobs:
+  resonance-check:
+    name: 🌌 Chromatic Resonance Ritual
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛰️ Manifesting Repository Artifacts
+        uses: actions/checkout@v4
+
+      - name: 🧪 Stabilizing Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 🕯️ Executing Terminal Ritual
+        run: |
+          PURGE_FLAG=""
+          if [ "${{ github.event.inputs.purge_mode }}" == "true" ]; then
+            PURGE_FLAG="--purge"
+          fi
+          python3 src/core/ml_cli.py --define-sector Neon_Veil --protocol Luminous_Static $PURGE_FLAG
