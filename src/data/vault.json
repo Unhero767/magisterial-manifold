@@ -1,14 +1,164 @@
 {
     "CORE": {
-        "consistency_a": 0.962,
-        "instability_ex": 0.0023323742831787273,
+        "consistency_a": 0.9420198208150086,
+        "instability_ex": 0.018765039656752237,
         "tethers": [],
         "entities": {
             "AURELIA_SEED": 0.2,
             "Primordial_Algorithm": 0.25,
             "Relational_Gravity": 0.25,
-            "Cybernetic_Logos": 0.25
+            "Cybernetic_Logos": 0.25,
+            "Axiom_2": 0.15,
+            "Axiom_4": 0.15,
+            "Gravitas_Core": 0.0
         },
-        "neighbors": []
+        "neighbors": [
+            "NEON_VEIL",
+            "QUANTUM_FISSURE",
+            "QUANTUM_FISSURE",
+            "CYBER_NEXUS",
+            "CYBER_NEXUS",
+            "QUANTUM_FISSURE",
+            "NEON",
+            "NEON_VEIL"
+        ]
+    },
+    "NEON_VEIL": {
+        "consistency_a": 0.9167200102549286,
+        "instability_ex": 0.010615421784182446,
+        "tethers": [],
+        "entities": {
+            "Aurelia_9": 0.25,
+            "Neon_Specter": 0.15,
+            "Circuit_Sage": 0.2,
+            "Pulse_Grid": 0.0,
+            "Neon_Shade": 0.15,
+            "K_M_Synthetica": 0.25,
+            "The_Ash_Chorus": 0.15,
+            "Gnostic_Wire": 0.25
+        },
+        "neighbors": [
+            "CORE",
+            "CYBER_NEXUS",
+            "DIGITAL_SHROUD",
+            "TO CYBER_NEXUS",
+            "DIGITAL_SHROUD",
+            "DIGITAL_SHROUD",
+            "NEON",
+            "CORE"
+        ]
+    },
+    "CYBER_NEXUS": {
+        "consistency_a": 0.9633500465703091,
+        "instability_ex": 0.010626049667013119,
+        "tethers": [],
+        "entities": {
+            "Echo_7": 0.05,
+            "Axiom_1": 0.2,
+            "Nexus_Prime": 0.15,
+            "Sentinel_0": 0.15,
+            "Nexus_Operator": 0.05,
+            "Circuit_Sentinel": 0.0,
+            "Veil_Sentinel": 0.0,
+            "Data_Weaver": 0.0
+        },
+        "neighbors": [
+            "NEON_VEIL",
+            "CORE",
+            "CORE",
+            "DIGITAL_SHROUD",
+            "DIGITAL_SHROUD"
+        ]
+    },
+    "QUANTUM_FISSURE": {
+        "consistency_a": 0.9912221517824624,
+        "instability_ex": 0.005782087510599791,
+        "tethers": [],
+        "entities": {
+            "Quantum_Shard": 0.0,
+            "Entropy_Warden": 0.0
+        },
+        "neighbors": [
+            "CORE",
+            "CORE",
+            "DIGITAL_SHROUD",
+            "CORE",
+            "DIGITAL_SHROUD",
+            "DIGITAL_SHROUD"
+        ]
+    },
+    "DIGITAL_SHROUD": {
+        "consistency_a": 0.9772601644094726,
+        "instability_ex": 0.02193435604917289,
+        "tethers": [],
+        "entities": {
+            "Shroud_Wraith": 0.15,
+            "Veil_Sentinel": 0.0
+        },
+        "neighbors": [
+            "NEON_VEIL",
+            "NEON_VEIL",
+            "QUANTUM_FISSURE",
+            "NEON_VEIL",
+            "CYBER_NEXUS",
+            "QUANTUM_FISSURE",
+            "QUANTUM_FISSURE",
+            "CYBER_NEXUS"
+        ]
+    },
+    "NEON": {
+        "consistency_a": 0.997010665015764,
+        "instability_ex": 0.005978669968471904,
+        "tethers": [],
+        "entities": {},
+        "neighbors": [
+            "NEON_VEIL",
+            "CORE"
+        ]
+    },
+    "TO CYBER_NEXUS": {
+        "consistency_a": 0.9973467984584321,
+        "instability_ex": 0.00530640308313566,
+        "tethers": [],
+        "entities": {},
+        "neighbors": [
+            "NEON_VEIL"
+        ]
+    },
+    "NEON_VEIL,": {
+        "consistency_a": 1.0,
+        "instability_ex": 0.0,
+        "tethers": [],
+        "entities": {},
+        "neighbors": [
+            "CYBER_NEXUS, QUANTUM_FUSSURE TO DIGITAL_SHROUD"
+        ]
+    },
+    "CYBER_NEXUS, QUANTUM_FUSSURE TO DIGITAL_SHROUD": {
+        "consistency_a": 1.0,
+        "instability_ex": 0.0,
+        "tethers": [],
+        "entities": {},
+        "neighbors": [
+            "NEON_VEIL,"
+        ]
+    },
+    "TO": {
+        "consistency_a": 1.0,
+        "instability_ex": 0.0,
+        "tethers": [],
+        "entities": {},
+        "neighbors": [
+            "CYBER_NEXUS CYBER_NEXUS"
+        ]
+    },
+    "CYBER_NEXUS CYBER_NEXUS": {
+        "consistency_a": 1.0,
+        "instability_ex": 0.0,
+        "tethers": [],
+        "entities": {},
+        "neighbors": [
+            "TO"
+        ]
     }
 }
