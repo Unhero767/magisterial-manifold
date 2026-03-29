@@ -34,3 +34,23 @@ class RuleEngine:
         Prevents the 'Abstraction Gap' from manifesting as logic-bleed[cite: 9].
         """
         pass
+
+    def ingest_lore(self, vault_data: dict):
+        """
+        Standardizes narrative ingestion by treating Lore as Meaning-Typed objects.
+        This resolves the friction between code semantics and natural language.
+        """
+        # Ensure ritual_log is accessible or defined
+        print(f"[LORE_SYNC] Initiating Neuro-Integrated ingestion of Lore_Vault.")
+        
+        for entry_id, content in vault_data.items():
+            # Treat each lore entry as a carrier of explicit intent 
+            intent_fragment = {
+                "origin": "Lore_Vault",
+                "entry_id": entry_id,
+                "semantic_weight": len(content) * 0.01,
+                "status": "UNVERIFIED"
+            }
+            # Link the fragment to the CORE_DOGMA
+            self.enforce_ground_truth({"return_type": "<class 'dict'>"}, intent_fragment)
+            print(f"[STANDARD_DOGMA] Lore Fragment '{entry_id}' Integrated.")
