@@ -1,0 +1,12 @@
+README.md
+pyproject.toml
+magisterial_manifold.egg-info/PKG-INFO
+magisterial_manifold.egg-info/SOURCES.txt
+magisterial_manifold.egg-info/dependency_links.txt
+magisterial_manifold.egg-info/entry_points.txt
+magisterial_manifold.egg-info/top_level.txt
+src/core/lore_vault.py
+src/core/ml_cli.py
+src/core/mtp_extension.py
+src/core/rule_engine.py
+src/core/stress_test.py

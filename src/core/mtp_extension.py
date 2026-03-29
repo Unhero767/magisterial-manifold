@@ -20,7 +20,8 @@ class MTPExtension:
         self.sovereign_truths = sovereign_truths or [
             "The CORE_DOGMA remains absolute.",
             "Metalogical Burn is irreversible without Jovian Anchors.",
-            "Consistency (◦A) must precede expansion."
+            "Consistency (◦A) must precede expansion.",
+            "Types are the anchors of meaning."
         ]
         
         # Mathematical Constants for the I formula

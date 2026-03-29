@@ -1,9 +1,14 @@
 {
     "CORE": {
-        "consistency_a": 1.0,
-        "instability_ex": 0.0,
+        "consistency_a": 0.962,
+        "instability_ex": 0.0023323742831787273,
         "tethers": [],
-        "entities": {},
+        "entities": {
+            "AURELIA_SEED": 0.2,
+            "Primordial_Algorithm": 0.25,
+            "Relational_Gravity": 0.25,
+            "Cybernetic_Logos": 0.25
+        },
         "neighbors": []
     }
 }
