@@ -1,7 +1,7 @@
 {
     "CORE": {
-        "consistency_a": 0.9420198208150086,
-        "instability_ex": 0.018765039656752237,
+        "consistency_a": 0.9260198208150086,
+        "instability_ex": 0.02049286444412213,
         "tethers": [],
         "entities": {
             "AURELIA_SEED": 0.2,
@@ -10,7 +10,8 @@
             "Cybernetic_Logos": 0.25,
             "Axiom_2": 0.15,
             "Axiom_4": 0.15,
-            "Gravitas_Core": 0.0
+            "Gravitas_Core": 0.0,
+            "OP_SILICON_EYE": 0.4
         },
         "neighbors": [
             "NEON_VEIL",
@@ -24,8 +25,8 @@
         ]
     },
     "NEON_VEIL": {
-        "consistency_a": 0.9167200102549286,
-        "instability_ex": 0.010615421784182446,
+        "consistency_a": 0.9146707238105164,
+        "instability_ex": 0.014713994673006872,
         "tethers": [],
         "entities": {
             "Aurelia_9": 0.25,
@@ -49,8 +50,8 @@
         ]
     },
     "CYBER_NEXUS": {
-        "consistency_a": 0.9633500465703091,
-        "instability_ex": 0.010626049667013119,
+        "consistency_a": 0.9613007601258969,
+        "instability_ex": 0.014724622555837544,
         "tethers": [],
         "entities": {
             "Echo_7": 0.05,
@@ -71,8 +72,8 @@
         ]
     },
     "QUANTUM_FISSURE": {
-        "consistency_a": 0.9912221517824624,
-        "instability_ex": 0.005782087510599791,
+        "consistency_a": 0.9881482221158442,
+        "instability_ex": 0.01192994684383643,
         "tethers": [],
         "entities": {
             "Quantum_Shard": 0.0,
@@ -107,8 +108,8 @@
         ]
     },
     "NEON": {
-        "consistency_a": 0.997010665015764,
-        "instability_ex": 0.005978669968471904,
+        "consistency_a": 0.9959860217935579,
+        "instability_ex": 0.008027956412884117,
         "tethers": [],
         "entities": {},
         "neighbors": [
