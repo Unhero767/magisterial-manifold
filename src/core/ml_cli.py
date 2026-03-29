@@ -12,7 +12,7 @@ def clear(): os.system('clear')
 def main():
     engine, mtp, vault = MetalogicalEngine(), MTPExtension(MetalogicalEngine()), LoreVault()
     weaver, oracle, m_vault = MasterWeaver(), AletheicMatrix(), MissionVault()
-    
+        
     saved_state = vault.load_manifold()
     if saved_state:
         for name, d in saved_state.items():
@@ -52,7 +52,12 @@ def main():
                 
                 if target.consistency_a < m['constraints']['min_consistency_a']:
                     print(f"[!] ABORT: Sector instability too high for {m['protagonist']}.")
-                else:
+                    elif cmd == "map":
+                print("\n[ GENERATING MANIFOLD MAP ]...")
+                    os.system("python3 src/tools/manifold_automation.py")
+                    os.system("open reports/manifold_graph.png")
+                print("[ MAP PROJECTED ]")
+		    else:
                     roll = random.random()
                     print(f"Resonance Check: {round(roll, 2)} vs {m['success_probability']['final_resonance']}")
                     if roll <= m['success_probability']['final_resonance']:
