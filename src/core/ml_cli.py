@@ -48,3 +48,33 @@ def main():
             input("\nPress Enter...")
 
 if __name__ == "__main__": main()
+
+# --- Magisterial Color Mapping ---
+PROTOCOL_COLORS = {
+    "Luminous_Static": CYAN if HAS_COLOR else "",
+    "Standard_Dogma": Fore.GREEN if HAS_COLOR else "",
+    "Purge": RED if HAS_COLOR else "",
+    "Lore_Sync": Fore.MAGENTA if HAS_COLOR else "",
+    "Alert": Fore.YELLOW if HAS_COLOR else ""
+}
+
+def ritual_log(protocol, message):
+    """Logs a message with the associated protocol color."""
+    color = PROTOCOL_COLORS.get(protocol, "")
+    prefix = f"[{protocol.upper()}]"
+    magisterial_print(f"{prefix} {message}", color)
+
+# --- Magisterial Color Mapping ---
+PROTOCOL_COLORS = {
+    "Luminous_Static": CYAN if HAS_COLOR else "",
+    "Standard_Dogma": (Fore.GREEN if HAS_COLOR else ""),
+    "Purge": (RED if HAS_COLOR else ""),
+    "Lore_Sync": (Fore.MAGENTA if HAS_COLOR else ""),
+    "Alert": (Fore.YELLOW if HAS_COLOR else "")
+}
+
+def ritual_log(protocol, message):
+    """Logs a message with the associated protocol color."""
+    color = PROTOCOL_COLORS.get(protocol, "")
+    prefix = f"[{protocol.upper()}]"
+    magisterial_print(f"{prefix} {message}", color)
