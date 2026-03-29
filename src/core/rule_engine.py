@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass, field
-from typing import Dict, Set, Any
+from typing import Dict, Set, Any, List
 
 @dataclass
 class ManifoldSector:
@@ -9,23 +9,40 @@ class ManifoldSector:
     instability_ex: float = 0.0
     tethers: Set[str] = field(default_factory=set)
     entities: Dict[str, float] = field(default_factory=dict)
+    neighbors: List[str] = field(default_factory=list)
 
 class MetalogicalEngine:
-    def __init__(self, burn_threshold: float = 0.60):
+    def __init__(self, burn_threshold: float = 0.55):
         self.sectors: Dict[str, ManifoldSector] = {"CORE": ManifoldSector("CORE")}
         self.burn_threshold = burn_threshold
+        self.global_entropy_coefficient = 0.02 # Natural decay per manifestation
+
+    def define_topology(self, sector_a: str, sector_b: str):
+        """Creates a spatial link between sectors for interference calculation."""
+        for s in [sector_a, sector_b]:
+            if s not in self.sectors: self.sectors[s] = ManifoldSector(s)
+        self.sectors[sector_a].neighbors.append(sector_b)
+        self.sectors[sector_b].neighbors.append(sector_a)
 
     def manifest_entity(self, sector_name: str, entity_id: str, weight: float) -> Dict[str, Any]:
-        if sector_name not in self.sectors:
-            self.sectors[sector_name] = ManifoldSector(sector_name)
+        sector = self.sectors.get(sector_name, ManifoldSector(sector_name))
+        self.sectors[sector_name] = sector
+
+        # 1. Local Drift Calculation
+        effective_weight = weight / (1.0 + (len(sector.tethers) * 0.8))
+        sector.consistency_a -= (effective_weight * 0.04)
         
-        sector = self.sectors[sector_name]
-        effective_weight = weight / (1.0 + (len(sector.tethers) * 0.5))
-        sector.consistency_a -= (effective_weight * 0.05)
-        
-        instability_spike = effective_weight * (0.1 / max(0.1, sector.consistency_a))
-        sector.instability_ex = min(1.0, sector.instability_ex + instability_spike)
-        
+        # 2. The 'Boil' Effect (Exponential Instability)
+        boil = (effective_weight**2 * 0.01) / max(0.05, sector.consistency_a)
+        sector.instability_ex = min(1.0, sector.instability_ex + boil)
+
+        # 3. Cross-Sector Interference (Bleed)
+        for neighbor_name in sector.neighbors:
+            neighbor = self.sectors[neighbor_name]
+            bleed = (sector.instability_ex * 0.1) # 10% of instability leaks
+            neighbor.instability_ex = min(1.0, neighbor.instability_ex + bleed)
+            neighbor.consistency_a = max(0.0, neighbor.consistency_a - (bleed * 0.5))
+
         sector.entities[entity_id] = weight
 
         if sector.consistency_a < self.burn_threshold:
@@ -33,19 +50,18 @@ class MetalogicalEngine:
 
         return {
             "status": "STABILIZED",
-            "telemetry": {"◦A": round(sector.consistency_a, 3), "Ex◦": round(sector.instability_ex, 3)},
-            "entities_count": len(sector.entities)
+            "telemetry": {"◦A": round(sector.consistency_a, 4), "Ex◦": round(sector.instability_ex, 4)},
+            "interference_active": len(sector.neighbors) > 0
         }
+
+    def _trigger_burn(self, sector: ManifoldSector):
+        sector.consistency_a, sector.instability_ex = 0.0, 1.0
+        return {"status": "METALOGICAL_BURN", "msg": f"Total ◦A Collapse in {sector.name}"}
 
     def apply_jovian_anchor(self, sector_name: str, tether_id: str):
         if sector_name in self.sectors:
             s = self.sectors[sector_name]
             s.tethers.add(tether_id)
-            s.consistency_a = min(1.0, s.consistency_a + 0.20)
-            s.instability_ex = max(0.0, s.instability_ex - 0.25)
-            return f"[ ◦A RESTORED ] Sector {sector_name} anchored by {tether_id}."
-
-    def _trigger_burn(self, sector: ManifoldSector):
-        sector.consistency_a = 0.0
-        sector.instability_ex = 1.0
-        return {"status": "METALOGICAL_BURN", "msg": f"Ex◦ Event in {sector.name}"}
+            s.consistency_a = min(1.0, s.consistency_a + 0.25)
+            s.instability_ex = max(0.0, s.instability_ex - 0.3)
+            return f"[ ◦A RESTORED ] Sector {sector_name} locked to {tether_id}."
