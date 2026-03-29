@@ -1,76 +1,83 @@
+#!/usr/bin/env python3
 import argparse
-import ast
+import sys
+import json
 import os
-import shutil
+from pathlib import Path
 
-class GlitchScanner:
-    """A Magisterial active-containment tool with Telemetry."""
-    def __init__(self, target_path=".", purge_mode=False):
-        self.target_path = target_path
-        self.purge_mode = purge_mode
-        self.burns = 0
-        self.scanned = 0
-        self.skipped = 0
-        # The absolute path to the Stasis Chamber
-        self.vault_path = os.path.expanduser("~/magisterial-manifold/glitch_vault")
+STATE_FILE = Path("src/data/reality_state.json")
 
-    def scan(self):
-        print(f"📡 [SCAN] Targeted Resonance: {self.target_path}")
-        if self.purge_mode:
-            print("⚠️ [SOVEREIGN COMMAND] Auto-Purge Protocol ENGAGED.")
-            
-        GLITCH_WASTES = {'.git', '__pycache__', 'venv', '.venv', 'node_modules', 'glitch_vault'}
-        
-        for root, dirs, files in os.walk(self.target_path):
-            dirs[:] = [d for d in dirs if d not in GLITCH_WASTES and not d.startswith('.')]
-            for file in files:
-                full_path = os.path.join(root, file)
-                if file.endswith(".py"):
-                    self._check(full_path)
-                else:
-                    self.skipped += 1
-        
-        self._report()
+def fossilize_state(payload):
+    """Writes the current reality state to the L1 Memory Spine (JSON)."""
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(STATE_FILE, "w") as f:
+            json.dump(payload, f, indent=4)
+        print(f"[ + ] Ledger updated: {STATE_FILE.name}")
+    except IOError as e:
+        print(f"[ - ] L0 Write Failure: {e}")
 
-    def _check(self, path):
-        self.scanned += 1
-        try:
-            with open(path, "r", encoding="utf-8", errors="ignore") as f:
-                content = f.read()
-                if content.strip():
-                    ast.parse(content)
-            print(f"  💎 {path}: OK")
-        except (SyntaxError, IndentationError) as e:
-            print(f"  🔥 {path}: BURN [{type(e).__name__}] at line {e.lineno}")
-            self.burns += 1
-            if self.purge_mode:
-                self._quarantine(path)
-        except Exception:
-            self.skipped += 1
+def init_parser():
+    parser = argparse.ArgumentParser(
+        description="MLAOS-Prime Logic Engine: Paraconsistent Reality CLI",
+        prog="ml-logic"
+    )
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    def _quarantine(self, path):
-        if not os.path.exists(self.vault_path):
-            os.makedirs(self.vault_path)
-            print(f"  🏛️ [VAULT] Constructed Stasis Chamber at {self.vault_path}")
-        
-        filename = os.path.basename(path)
-        dest = os.path.join(self.vault_path, filename)
-        shutil.move(path, dest)
-        print(f"  ☣️ [QUARANTINE] Artifact displaced to glitch_vault/{filename}")
+    mission_parser = subparsers.add_parser("run-mission", help="Execute a specific narrative/structural mission")
+    mission_parser.add_argument("mission_id", type=str, help="The designated ID of the operation")
+    mission_parser.add_argument("--force", action="store_true", help="Bypass standard checks")
 
-    def _report(self):
-        print("\n--- 📜 Magisterial Telemetry Report ---")
-        status = "🛡️ PURE" if self.burns == 0 else f"🔥 {self.burns} BURNS"
-        print(f"  [STATUS]     {status}")
-        print(f"  [SCANNED]    {self.scanned} Artifacts")
-        print(f"  [SKIPPED]    {self.skipped} Noise/Foreign Files")
-        print(f"  [EFFICIENCY] {round((self.scanned / (self.scanned + self.skipped + 1)) * 100, 2)}% Logic Density")
-        print("---------------------------------------\n")
+    subparsers.add_parser("stand-down", help="Retract weapons and secure Sector-01")
+
+    return parser
+
+def execute_mission(mission_id: str, force: bool):
+    if mission_id == "MP_01_SILICON_EYE":
+        print("[ ! ] SECURITY BREACH DETECTED IN SECTOR-01")
+        print("[ * ] Initiating extraction protocol for Aurelia-9...")
+        combat_state = {
+            "encounter_active": True,
+            "mission_id": mission_id,
+            "threat_level": "CRITICAL",
+            "active_perimeter": "Zk_Kinetic",
+            "aurelia_loadout": {
+                "weapon_drawn": "Sy-As_Edge",
+                "magnetism_level": 100
+            },
+            "force_flag_active": force
+        }
+        fossilize_state(combat_state)
+        print("[ + ] Sentinel Encounter deployed.")
+    else:
+        print(f"[ - ] Error: Mission ID '{mission_id}' is not recognized.")
+
+def secure_sector():
+    print("[ * ] Retracting Zekian Kinetic perimeter...")
+    print("[ * ] Powering down Sy-As Edge...")
+    calm_state = {
+        "encounter_active": False,
+        "threat_level": "SECURE",
+        "active_perimeter": "STANDBY",
+        "aurelia_loadout": {
+            "weapon_drawn": "None",
+            "magnetism_level": 0
+        }
+    }
+    fossilize_state(calm_state)
+    print("[ + ] Sector-01 SECURE. Awaiting command.")
+
+def main():
+    parser = init_parser()
+    args = parser.parse_args()
+
+    if args.command == "run-mission":
+        execute_mission(args.mission_id, args.force)
+    elif args.command == "stand-down":
+        secure_sector()
+    else:
+        parser.print_help()
+        sys.exit(1)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Magisterial Resonance Scanner")
-    parser.add_argument("target", nargs="?", default=".", help="Target sector to scan")
-    parser.add_argument("--purge", action="store_true", help="Engage the Auto-Purge protocol")
-    args = parser.parse_args()
-    
-    GlitchScanner(target_path=args.target, purge_mode=args.purge).scan()
+    main()

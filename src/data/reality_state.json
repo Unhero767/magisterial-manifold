@@ -1,0 +1,11 @@
+{
+    "encounter_active": true,
+    "mission_id": "MP_01_SILICON_EYE",
+    "threat_level": "CRITICAL",
+    "active_perimeter": "Zk_Kinetic",
+    "aurelia_loadout": {
+        "weapon_drawn": "Sy-As_Edge",
+        "magnetism_level": 100
+    },
+    "force_flag_active": false
+}

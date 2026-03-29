@@ -1,0 +1,22 @@
+=========================================================
+L4 BASILICA ATLAS: MAIN ENGINE GRAFTING INSTRUCTIONS
+=========================================================
+Open your main Pygame script and paste these pieces:
+
+1. AT THE TOP (IMPORTS):
+from src.core.observer import RealityObserver
+
+2. BEFORE YOUR MAIN LOOP:
+reality_observer = RealityObserver()
+
+3. INSIDE YOUR MAIN GAME LOOP (e.g., inside `while running:`):
+    if reality_observer.poll_ledger():
+        current_state = reality_observer.current_state
+        
+        if current_state.get("encounter_active"):
+            print("[PYGAME] Threat Critical. Aurelia-9 entering combat stance.")
+            # TODO: player.equip(current_state["aurelia_loadout"]["weapon_drawn"])
+        else:
+            print("[PYGAME] Sector Secure. Returning to passive rendering.")
+            # TODO: player.sheathe_weapon()
+=========================================================
