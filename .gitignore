@@ -1,0 +1,9 @@
+# Magisterial Exclusions
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+
+# Environment Exclusions
+.venv/
+env/
