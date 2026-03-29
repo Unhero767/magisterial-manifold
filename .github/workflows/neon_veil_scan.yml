@@ -11,7 +11,8 @@ on:
         default: false
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  # 🚀 Future-proofing the substrate
+  # 🚀 Sovereign Command: Force Node.js 24 to align with future epochs
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   resonance-check:
@@ -28,8 +29,13 @@ jobs:
 
       - name: 📜 Ingesting Magisterial Dependencies
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then 
+            pip install -r requirements.txt
+          else 
+            echo "⚠️ [NOTICE] No requirements.txt found. Environment may be unstable."
+          fi
 
       - name: 🕯️ Executing Terminal Ritual
         run: |
+          # Added 'python3' explicit call to ensure path consistency
           python3 src/core/ml_cli.py --define-sector Neon_Veil --protocol Luminous_Static
