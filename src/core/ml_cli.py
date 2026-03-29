@@ -13,10 +13,11 @@ def main():
     while True:
         clear()
         sector = engine.sectors.get(current_sector)
-        print(f"=== MLAOS ARCHITECT INTERFACE (MTP-ENABLED) ===")
-        print(f"SECTOR: {current_sector} | ◦A: {round(sector.consistency_a, 3)} | Ex◦: {round(sector.instability_ex, 3)}")
-        print("-" * 48)
-        print("COMMANDS: manifest [id] [description] | anchor [id] | quit")
+        print(f"=== MLAOS ARCHITECT INTERFACE (TOPOLOGY-AWARE) ===")
+        print(f"SECTOR: {current_sector} | ◦A: {round(sector.consistency_a, 4)} | Ex◦: {round(sector.instability_ex, 4)}")
+        print(f"NEIGHBORS: {', '.join(sector.neighbors) if sector.neighbors else 'NONE'}")
+        print("-" * 52)
+        print("COMMANDS: manifest [id] [desc] | anchor [id] | link [s1] [s2] | sector [name] | quit")
         
         try:
             line = input("\n[MTP_INPUT]> ").strip().split(' ', 2)
@@ -24,6 +25,15 @@ def main():
             cmd = line[0].lower()
             
             if cmd == "quit": break
+            elif cmd == "sector":
+                current_sector = line[1].upper()
+                if current_sector not in engine.sectors:
+                    engine.sectors[current_sector] = ManifoldSector(current_sector)
+            elif cmd == "link":
+                s1, s2 = line[1].upper(), line[2].upper()
+                engine.define_topology(s1, s2)
+                print(f"\n[ ✓ ] TOPOLOGY SYNCED: {s1} <--> {s2}")
+                input("\nPress Enter...")
             elif cmd == "manifest":
                 eid, desc = line[1], line[2]
                 res = mtp.manifest_narrative(current_sector, eid, desc)
