@@ -4,6 +4,7 @@ from rule_engine import MetalogicalEngine, ManifoldSector
 from mtp_extension import MTPExtension
 from lore_vault import LoreVault
 from master_weaver import MasterWeaver
+from aletheic_matrix import AletheicMatrix
 
 def clear(): os.system('clear')
 
@@ -12,6 +13,7 @@ def main():
     mtp = MTPExtension(engine)
     vault = LoreVault()
     weaver = MasterWeaver()
+    oracle = AletheicMatrix()
     
     # Attempt to load existing manifold state
     saved_state = vault.load_manifold()
@@ -28,11 +30,12 @@ def main():
     while True:
         clear()
         sector = engine.sectors.get(current_sector)
-        print(f"=== MLAOS ARCHITECT INTERFACE (WEAVER-LINKED) ===")
+        print(f"=== MLAOS ARCHITECT INTERFACE (ORACLE-LINKED) ===")
         print(f"SECTOR: {current_sector} | ◦A: {round(sector.consistency_a, 4)} | Ex◦: {round(sector.instability_ex, 4)}")
         print(f"NEIGHBORS: {', '.join(sector.neighbors) if sector.neighbors else 'NONE'}")
         print("-" * 55)
-        print("COMMANDS: manifest [id] [desc] | anchor [id] | link [s1] [s2] | sector [name] | weave | quit")
+        print("COMMANDS: manifest [id] [desc] | anchor [id] | link [s1] [s2]")
+        print("          sector [name] | weave | query [question] | quit")
         
         try:
             line = input("\n[MTP_INPUT]> ").strip().split(' ', 2)
@@ -57,10 +60,8 @@ def main():
                 else:
                     eid, desc = line[1], line[2]
                     res = mtp.manifest_narrative(current_sector, eid, desc)
-                    
                     telemetry = res.get('mtp_telemetry', {})
                     print(f"\n[MTP INDEX (I)]: {telemetry.get('I_divergence', 'N/A')}")
-                    
                     if "Ex◦" in telemetry.get('status', ''):
                         print(f"[ ! QUARANTINE ! ]: {telemetry.get('msg')}")
                     else:
@@ -72,6 +73,13 @@ def main():
                     print(f"\n{engine.apply_jovian_anchor(current_sector, line[1])}")
             elif cmd == "weave":
                 print(weaver.weave_diagnostics())
+            elif cmd == "query":
+                if len(line) < 2:
+                    print("\n[!] Usage: query [natural language question]")
+                else:
+                    # Re-join the question if it was split
+                    full_query = " ".join(line[1:])
+                    print(oracle.interrogate(full_query))
             
             # AUTOMATIC PERSISTENCE
             vault.save_manifold(engine.sectors)
