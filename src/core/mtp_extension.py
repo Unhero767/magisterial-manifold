@@ -1,6 +1,7 @@
 import re
 import sys
 import os
+from typing import List, Dict, Any
 
 # Align path to find rule_engine
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -8,55 +9,99 @@ from rule_engine import MetalogicalEngine
 
 class MTPExtension:
     """
-    The Meaning-Typed Programming (MTP) bridge for MLAOS.
-    Automates the 'by llm()' logic for weight derivation.
+    Formalizes the Semantic Ingestion Sequence using MTP principles.
+    Enforces Sovereign Truths and calculates the Index of Divergence (I).
     """
-    def __init__(self, engine: MetalogicalEngine):
+    def __init__(self, engine: MetalogicalEngine, sovereign_truths: List[str] = None):
         self.engine = engine
-        # Keywords that trigger high instability (Ex◦)
-        self.entropy_triggers = [
-            "paradox", "glitch", "shattered", "void", 
-            "contradiction", "unmade", "forbidden", "ancient"
+        self.logic_threshold = 0.85
+        
+        # The immutable axioms of the Manifold
+        self.sovereign_truths = sovereign_truths or [
+            "The CORE_DOGMA remains absolute.",
+            "Metalogical Burn is irreversible without Jovian Anchors.",
+            "Consistency (◦A) must precede expansion."
         ]
+        
+        # Mathematical Constants for the I formula
+        self.W_t = 0.15  # Weight of defined structural thresholds
+        self.beta = 0.05 # Contextual buffer (simulating Walker spatial memory)
 
-    def by_llm_weighting(self, description: str) -> float:
+    def _calculate_semantic_proximity(self, narrative: str) -> float:
         """
-        Simulates the MTP 'by llm()' operator.
-        Extracts semantic mass from natural language.
+        Simulates the LLM high-dimensional latent space calculation (W_l).
+        Measures cosine similarity divergence from Sovereign Truths.
         """
-        # Base weight derived from length (Structural Complexity)
-        base_weight = len(description.split()) * 0.1
+        divergence = 0.10
+        narrative_lower = narrative.lower()
         
-        # Entropy multiplier based on 'Instability Keywords'
-        entropy_score = sum(1.5 for word in self.entropy_triggers if word in description.lower())
-        
-        # Proper Noun density (Relational Complexity)
-        proper_nouns = len(re.findall(r'\b[A-Z][a-z]*\b', description))
-        
-        calculated_weight = base_weight + entropy_score + (proper_nouns * 0.2)
-        return round(min(10.0, calculated_weight), 2)
+        # Simulated divergence triggers against Sovereign Truths
+        anomalies = ["paradox", "shattered", "void", "unmade", "forbidden", "glitch", "infinite"]
+        for word in anomalies:
+            if word in narrative_lower:
+                divergence += 0.25 # High divergence penalty
+                
+        return min(1.0, divergence)
 
-    def manifest_narrative(self, sector_name: str, entity_id: str, description: str):
+    def by_llm_weighting(self, narrative: str) -> float:
         """
-        The MTP manifestation ritual. 
-        Translates raw 'Meaning' into 'Logic'.
+        Derives the logic_weight using the exact Index of Divergence formula:
+        I = (W_t * T) + (W_l * N_trig) - Beta
         """
-        weight = self.by_llm_weighting(description)
-        result = self.engine.manifest_entity(sector_name, entity_id, weight)
+        # T: Number of structural thresholds crossed (e.g., length complexity)
+        word_count = len(narrative.split())
+        T = 1 if word_count > 10 else 0
+        if word_count > 30: T = 2
+
+        # W_l: Dynamically derived semantic proximity
+        W_l = self._calculate_semantic_proximity(narrative)
+
+        # N_trig: Conditional triggers engaged (capitalized entities/concepts)
+        proper_nouns = re.findall(r'\b[A-Z][A-Za-z0-9_]*\b', narrative)
+        N_trig = len(proper_nouns) * 0.5
+        if N_trig == 0: N_trig = 0.5 # Minimum trigger baseline
+
+        # I: Index of Divergence
+        I = (self.W_t * T) + (W_l * N_trig) - self.beta
+        
+        return round(max(0.0, I), 3)
+
+    def manifest_narrative(self, sector_name: str, entity_id: str, description: str) -> Dict[str, Any]:
+        """
+        The execution phase of the Semantic Ingestion Sequence.
+        Includes an automatic Ex◦ Quarantine Protocol.
+        """
+        index_I = self.by_llm_weighting(description)
+        
+        # The Ex◦ Anomaly Detection
+        if index_I > self.logic_threshold:
+            return {
+                "mtp_telemetry": {
+                    "I_divergence": index_I,
+                    "status": "Ex◦ ANOMALY DETECTED: QUARANTINED",
+                    "msg": f"Narrative rejected. Index {index_I} exceeds {self.logic_threshold} threshold."
+                },
+                "engine_result": {"status": "BLOCKED_BY_BRIDGE"}
+            }
+
+        # If mathematically stable, pass to the Walker/Engine for topological manifestation
+        result = self.engine.manifest_entity(sector_name, entity_id, index_I)
         
         return {
             "mtp_telemetry": {
-                "derived_weight": weight,
-                "semantic_density": "HIGH" if weight > 4.0 else "STABLE"
+                "I_divergence": index_I,
+                "status": "SEMANTIC_INGESTION_SAFE"
             },
             "engine_result": result
         }
 
 if __name__ == "__main__":
-    # Internal validation of the MTP Bridge
+    # Internal Validation Sequence
     engine = MetalogicalEngine()
     mtp = MTPExtension(engine)
     
-    test_lore = "Aurelia-9 possesses a shattered paradox from the ancient CORE_DOGMA."
-    print(f"Ingesting Narrative: {test_lore}")
-    print(mtp.manifest_narrative("CORE", "Aurelia_Relic", test_lore))
+    print("Testing Safe Logic...")
+    print(mtp.manifest_narrative("CORE", "Test_01", "A standard Magisterial node."))
+    
+    print("\nTesting Ex◦ Anomaly...")
+    print(mtp.manifest_narrative("GLITCH_WASTES", "Paradox_01", "An infinite shattered paradox of forbidden CORE_DOGMA."))
