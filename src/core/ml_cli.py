@@ -1,81 +1,56 @@
-import sys, os, random
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from rule_engine import MetalogicalEngine, ManifoldSector
-from mtp_extension import MTPExtension
-from lore_vault import LoreVault
-from master_weaver import MasterWeaver
-from aletheic_matrix import AletheicMatrix
-from mission_vault import MissionVault
+import ast
+import os
+import sys
 
-def clear(): os.system('clear')
+class GlitchScanner:
+    """A Magisterial diagnostic tool with Telemetry tracking."""
+    def __init__(self, target_path="."):
+        self.target_path = target_path
+        self.burns = 0
+        self.scanned = 0
+        self.skipped = 0
 
-def main():
-    engine, mtp, vault = MetalogicalEngine(), MTPExtension(MetalogicalEngine()), LoreVault()
-    weaver, oracle, m_vault = MasterWeaver(), AletheicMatrix(), MissionVault()
+    def scan(self):
+        print(f"📡 [SCAN] Targeted Resonance: {self.target_path}")
+        GLITCH_WASTES = {'.git', '__pycache__', 'venv', '.venv', 'node_modules'}
         
-    saved_state = vault.load_manifold()
-    if saved_state:
-        for name, d in saved_state.items():
-            s = ManifoldSector(name, d["consistency_a"], d["instability_ex"])
-            s.tethers, s.entities, s.neighbors = set(d["tethers"]), d["entities"], d["neighbors"]
-            engine.sectors[name] = s
+        for root, dirs, files in os.walk(self.target_path):
+            # 🛡️ SEAL THE BOUNDARY
+            dirs[:] = [d for d in dirs if d not in GLITCH_WASTES and not d.startswith('.')]
             
-    current_sector = "CORE"
-    
-    while True:
-        clear()
-        sector = engine.sectors.get(current_sector)
-        print(f"=== MLAOS ARCHITECT INTERFACE (MISSION-ACTIVE) ===")
-        print(f"SECTOR: {current_sector} | ◦A: {round(sector.consistency_a, 4)} | Ex◦: {round(sector.instability_ex, 4)}")
-        print("-" * 55)
-        print("COMMANDS: manifest | anchor | link | sector | weave | query")
-        print("          missions | run-mission [id] | quit")
+            for file in files:
+                full_path = os.path.join(root, file)
+                if file.endswith(".py"):
+                    self._check(full_path)
+                else:
+                    # 🌫️ TRACK NOISE: Increment skipped count for non-python files
+                    self.skipped += 1
         
+        self._report()
+
+    def _check(self, path):
+        self.scanned += 1
         try:
-            line = input("\n[MTP_INPUT]> ").strip().split(' ', 2)
-            if not line: continue
-            cmd = line[0].lower()
-            
-            if cmd == "quit": break
-            elif cmd == "missions":
-                missions = m_vault.load_all()
-                for mid, m in missions.items():
-                    print(f"- {mid}: {m['objective']['primary']} (Threat: {m['objective']['threat_level']})")
-            elif cmd == "run-mission":
-                mid = line[1]
-                m = m_vault.load_all().get(mid)
-                if not m: print("[!] Mission not found."); continue
-                
-                target = engine.sectors.get(m['sector'])
-                print(f"\n--- INITIATING {mid} ---")
-                print(f"Target Sector: {m['sector']} (◦A: {target.consistency_a})")
-                
-                if target.consistency_a < m['constraints']['min_consistency_a']:
-                    print(f"[!] ABORT: Sector instability too high for {m['protagonist']}.")
-                    elif cmd == "map":
-                print("\n[ GENERATING MANIFOLD MAP ]...")
-                    os.system("python3 src/tools/manifold_automation.py")
-                    os.system("open reports/manifold_graph.png")
-                print("[ MAP PROJECTED ]")
-		    else:
-                    roll = random.random()
-                    print(f"Resonance Check: {round(roll, 2)} vs {m['success_probability']['final_resonance']}")
-                    if roll <= m['success_probability']['final_resonance']:
-                        print(f"[ SUCCESS ]: {m['protagonist']} extracted {len(m['loot_table'])} fragments.")
-                        for item in m['loot_table']: print(f"  > Received: {item['id']} ({item['utility']})")
-                    else:
-                        print(f"[ FAILURE ]: {m['failure_protocol']} engaged.")
-            
-            elif cmd == "weave": print(weaver.weave_diagnostics())
-            elif cmd == "query": print(oracle.interrogate(" ".join(line[1:])))
-            elif cmd == "manifest":
-                eid, desc = line[1], line[2]
-                res = mtp.manifest_narrative(current_sector, eid, desc)
-                print(f"\n[RESULT]: {res.get('engine_result', {}).get('status', 'STABILIZED')}")
-            
-            vault.save_manifold(engine.sectors)
-            input("\nPress Enter...")
-        except Exception as e:
-            print(f"\n[!] Error: {e}"); input("\nPress Enter...")
+            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+                content = f.read()
+                if content.strip():
+                    ast.parse(content)
+            print(f"  💎 {path}: OK")
+        except (SyntaxError, IndentationError) as e:
+            print(f"  🔥 {path}: BURN [{type(e).__name__}] at line {e.lineno}")
+            self.burns += 1
+        except Exception:
+            self.skipped += 1
 
-if __name__ == "__main__": main()
+    def _report(self):
+        print("\n--- 📜 Magisterial Telemetry Report ---")
+        status = "🛡️ PURE" if self.burns == 0 else f"🔥 {self.burns} BURNS"
+        print(f"  [STATUS]    {status}")
+        print(f"  [SCANNED]   {self.scanned} Artifacts")
+        print(f"  [SKIPPED]   {self.skipped} Noise/Foreign Files")
+        print(f"  [EFFICIENCY] {round((self.scanned / (self.scanned + self.skipped + 1)) * 100, 2)}% Logic Density")
+        print("---------------------------------------\n")
+
+if __name__ == "__main__":
+    target = sys.argv[1] if len(sys.argv) > 1 else "."
+    GlitchScanner(target).scan()
