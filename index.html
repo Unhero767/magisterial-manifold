@@ -1,0 +1,182 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Unbounded:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg0:#070A12;
+    --bg1:#0B1022;
+    --ink:#EAF0FF;
+    --muted:#A9B3D6;
+    --faint:#7E88B5;
+
+    --veil:#66F0FF;
+    --aegis:#9D7BFF;
+    --ember:#FF4D7D;
+    --gold:#F6D46B;
+    --sage:#6CFFB2;
+
+    --line: color-mix(in oklab, var(--ink) 14%, transparent);
+    --glass: color-mix(in oklab, white 8%, transparent);
+    --shadow: 0 24px 80px rgba(0,0,0,.55);
+    --shadow2: 0 10px 30px rgba(0,0,0,.5);
+
+    --r: 18px;
+    --r2: 26px;
+
+    --max: 1180px;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --display: "Unbounded", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 800px at 10% 10%, color-mix(in oklab, var(--veil) 14%, transparent), transparent 55%),
+      radial-gradient(900px 700px at 88% 15%, color-mix(in oklab, var(--aegis) 16%, transparent), transparent 60%),
+      radial-gradient(900px 900px at 60% 90%, color-mix(in oklab, var(--ember) 10%, transparent), transparent 55%),
+      linear-gradient(180deg, var(--bg0), var(--bg1));
+    font-family:var(--mono);
+    letter-spacing:.01em;
+    overflow-x:hidden;
+  }
+
+  /* Subtle grid + noise */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background:
+      linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity:.12;
+    pointer-events:none;
+    mask-image: radial-gradient(1200px 800px at 30% 10%, black 55%, transparent 80%);
+  }
+  body::after{
+    content:"";
+    position:fixed; inset:-20%;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255,255,255,.06), transparent 40%),
+      radial-gradient(circle at 70% 60%, rgba(255,255,255,.04), transparent 45%),
+      repeating-linear-gradient(120deg, rgba(255,255,255,.02) 0 2px, transparent 2px 6px);
+    mix-blend-mode:overlay;
+    opacity:.14;
+    pointer-events:none;
+    filter: blur(.2px);
+    animation: drift 18s linear infinite;
+  }
+
+  @keyframes drift{
+    0%{transform:translate3d(0,0,0) rotate(0deg)}
+    100%{transform:translate3d(-3%,2%,0) rotate(2deg)}
+  }
+
+  a{color:inherit}
+  .wrap{max-width:var(--max); margin:0 auto; padding: clamp(18px, 2.4vw, 28px);}
+  header{
+    position:sticky; top:0; z-index:20;
+    backdrop-filter: blur(10px);
+    background: color-mix(in oklab, var(--bg0) 72%, transparent);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:14px;
+    padding: 14px 0;
+  }
+
+  .brand{
+    display:flex; align-items:center; gap:12px;
+    min-width: 240px;
+  }
+  .sig{
+    width:36px; height:36px; border-radius:12px;
+    background:
+      radial-gradient(18px 18px at 30% 30%, rgba(255,255,255,.35), transparent 55%),
+      conic-gradient(from 190deg, var(--veil), var(--aegis), var(--ember), var(--veil));
+    box-shadow: 0 10px 30px rgba(0,0,0,.45);
+    border:1px solid color-mix(in oklab, white 16%, transparent);
+    position:relative;
+    overflow:hidden;
+  }
+  .sig::after{
+    content:"";
+    position:absolute; inset:-40%;
+    background: radial-gradient(circle at 40% 40%, rgba(255,255,255,.20), transparent 55%);
+    transform: rotate(25deg);
+  }
+  .brand h1{
+    font-family:var(--display);
+    font-size: 14px;
+    margin:0;
+    letter-spacing:.02em;
+  }
+  .brand p{
+    margin:0;
+    font-size:12px;
+    color:var(--muted);
+  }
+
+  .navlinks{
+    display:none;
+    gap:18px;
+    align-items:center;
+    color:var(--muted);
+    font-size:12px;
+  }
+  @media (min-width: 860px){
+    .navlinks{display:flex}
+  }
+  .navlinks a{
+    text-decoration:none;
+    padding:10px 10px;
+    border-radius: 12px;
+    border:1px solid transparent;
+    transition: .2s ease;
+  }
+  .navlinks a:hover{
+    border-color: var(--line);
+    background: color-mix(in oklab, white 6%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .ctaRow{display:flex; gap:10px; align-items:center}
+  .btn{
+    border:1px solid color-mix(in oklab, white 16%, transparent);
+    background: color-mix(in oklab, white 7%, transparent);
+    color:var(--ink);
+    padding: 10px 12px;
+    border-radius: 14px;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.02em;
+    cursor:pointer;
+    transition: .18s ease;
+    display:inline-flex; align-items:center; gap:10px;
+    box-shadow: var(--shadow2);
+    user-select:none;
+    text-decoration:none;
+  }
+  .btn:hover{transform: translateY(-1px); border-color: color-mix(in oklab, var(--veil) 35%, white 10%);}
+  .btn:active{transform: translateY(0px) scale(.99)}
+  .btn.primary{
+    border-color: color-mix(in oklab, var(--veil) 48%, transparent);
+    background:
+      radial-gradient(180px 120px at 20% 10%, color-mix(in oklab, var(--veil) 22%, transparent), transparent 65%),
+      radial-gradient(260px 160px at 85% 20%, color-mix(in oklab, var(--aegis) 18%, transparent), transparent 70%),
+      color-mix(in oklab, white 6%, transparent);
+  }
+  .pill{
+    font-size:11px;
+    color: color-mix(in oklab, var(--ink) 80%, var(--muted));
+    border:1px solid var(--line);
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: color-mix(in oklab, white 6%, transparent);
+    white-space:nowrap;
+  }
+</style>
