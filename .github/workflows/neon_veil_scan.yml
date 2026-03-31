@@ -1,41 +1,32 @@
-name: 'Neon_Veil Sector Scan'
+name: Neon_Veil Sector Scan
 
 on:
   push:
-    branches: [ "main" ]
-  workflow_dispatch:
-    inputs:
-      purge_mode:
-        description: 'Enable active quarantine?'
-        type: boolean
-        default: false
-
-env:
-  # 🚀 Sovereign Command: Force Node.js 24 to align with future epochs
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    branches: [ main ]
 
 jobs:
   resonance-check:
-    name: 🌌 Chromatic Resonance Ritual
     runs-on: ubuntu-latest
+    name: Initiating Luminous_Static Protocol
+    
     steps:
-      - name: 🛰️ Manifesting Repository Artifacts
+      - name: 🛰️ Check out Manifold Artifacts
         uses: actions/checkout@v4
 
-      - name: 🧪 Aligning to Local Resonance (Python 3.13)
+      - name: 🐍 Manifest Python 3.10 Environment
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.10'
 
-      - name: 📜 Ingesting Magisterial Dependencies
+      - name: 🧪 Synchronize Dependencies
         run: |
-          if [ -f requirements.txt ]; then 
+          if [ -f requirements.txt ]; then
+            python -m pip install --upgrade pip
             pip install -r requirements.txt
-          else 
-            echo "⚠️ [NOTICE] No requirements.txt found. Environment may be unstable."
+          else
+            echo "💎 No external dependencies required. Proceeding with core logic."
           fi
 
-      - name: 🕯️ Executing Terminal Ritual
+      - name: 📡 Execute Luminous_Static Ritual
         run: |
-          # Added 'python3' explicit call to ensure path consistency
           python3 src/core/ml_cli.py --define-sector Neon_Veil --protocol Luminous_Static
