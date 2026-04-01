@@ -1,0 +1,1 @@
+STRESS_TEST :: Injecting 5.0 Logic-Debt Units into NULL-NODE aperture.

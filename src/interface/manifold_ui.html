@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>MLAOS — Kinetic Command</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;700&family=Recursive:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #020617; --panel: rgba(15, 23, 42, 0.7); --border: rgba(30, 41, 59, 0.8);
+      --cyan: #06b6d4; --magenta: #d946ef; --gold: #eab308; --acid: #22c55e; --danger: #ef4444;
+      --font-mono: "Recursive", monospace; --font-display: "Oxanium", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body, html { height: 100%; margin: 0; background: var(--bg); color: #f8fafc; font-family: var(--font-mono); overflow: hidden; }
+    
+    /* Star Map Background */
+    #canvas-container { position: fixed; inset: 0; z-index: 0; background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%); }
+    .star { position: absolute; border-radius: 50%; background: #fff; pointer-events: none; }
+
+    /* Main Layout */
+    .interface { position: relative; z-index: 10; display: flex; flex-direction: column; height: 100vh; padding: 20px; gap: 20px; }
+    
+    /* Top HUD */
+    .hud { display: flex; justify-content: space-between; background: var(--panel); backdrop-filter: blur(12px); border: 1px solid var(--border); padding: 15px 25px; border-radius: 12px; }
+    .hud-item { display: flex; flex-direction: column; gap: 4px; }
+    .hud-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .hud-value { font-family: var(--font-display); font-weight: bold; font-size: 16px; color: var(--cyan); }
+
+    /* Command Center */
+    .workspace { display: grid; grid-template-columns: 1fr 350px; gap: 20px; flex: 1; min-height: 0; }
+    .terminal-panel { display: flex; flex-direction: column; background: var(--panel); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .panel-header { padding: 10px 20px; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); font-family: var(--font-display); font-size: 12px; font-weight: bold; color: var(--cyan); letter-spacing: 0.1em; }
+    
+    #log { flex: 1; padding: 20px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 8px; scroll-behavior: smooth; }
+    .t-line { display: flex; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 4px; }
+    .t-time { color: #475569; font-size: 11px; }
+
+    .input-area { padding: 20px; background: rgba(0,0,0,0.4); display: flex; gap: 15px; }
+    input { flex: 1; background: #000; border: 1px solid var(--border); border-radius: 6px; padding: 12px; color: var(--cyan); outline: none; font-family: var(--font-mono); }
+    button { background: var(--cyan); color: #000; border: none; padding: 0 25px; border-radius: 6px; font-family: var(--font-display); font-weight: bold; cursor: pointer; transition: 0.2s; }
+    button:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--cyan); }
+
+    /* Oracle Sidebar */
+    .oracle-panel { background: var(--panel); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+    #oracle-content { flex: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 15px; font-size: 12.5px; line-height: 1.6; color: #cbd5e1; overflow-y: auto; }
+    
+    /* Animations */
+    @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+    .pulse { animation: pulse 2s infinite; }
+  </style>
+</head>
+<body>
+
+<div id="canvas-container"></div>
+
+<div class="interface">
+  <header class="hud">
+    <div class="hud-item">
+      <div class="hud-label">System State</div>
+      <div class="hud-value" style="color:var(--acid)">🛡️ AEGIS ARMED</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">Logic Mass</div>
+      <div class="hud-value" id="mass-display">558 Lines</div>
+    </div>
+    <div class="hud-item">
+      <div class="hud-label">Sector Topology</div>
+      <div class="hud-value" style="color:var(--magenta)">NEON_VEIL ALPHA</div>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <div class="terminal-panel">
+      <div class="panel-header">KINETIC HELM — LUMINOUS_STATIC v2.0</div>
+      <div id="log"></div>
+      <div class="input-area">
+        <input type="text" id="cmd" placeholder="Execute protocol (resonate, gemini search: [query])..." autocomplete="off">
+        <button onclick="execute()">EXECUTE</button>
+      </div>
+    </div>
+
+    <div class="oracle-panel">
+      <div class="panel-header" style="color:var(--gold)">ORACLE TELEMETRY</div>
+      <div id="oracle-content">
+        <div style="text-align:center; margin-top:50px; color:#475569;">Awaiting Signal...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- Background Star Engine ---
+  const container = document.getElementById('canvas-container');
+  for (let i = 0; i < 200; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    const size = Math.random() * 2.5;
+    star.style.width = star.style.height = size + 'px';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.opacity = Math.random();
+    if (Math.random() > 0.9) star.style.boxShadow = `0 0 10px #fff`;
+    container.appendChild(star);
+  }
+
+  // --- Core Terminal Logic ---
+  const logDiv = document.getElementById('log');
+  const oracleContent = document.getElementById('oracle-content');
+
+  function addLog(msg, color = "var(--ink)") {
+    const time = new Date().toLocaleTimeString();
+    logDiv.innerHTML += `<div class="t-line"><span class="t-time">[${time}]</span> <span style="color:${color}">${msg}</span></div>`;
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
+
+  async function execute() {
+    const input = document.getElementById('cmd');
+    const cmd = input.value.trim();
+    input.value = '';
+    if (!cmd) return;
+    addLog(`> ${cmd}`, "var(--gold)");
+
+    if (cmd === 'resonate') {
+      addLog("≋ Initiating Resonance Pulse...", "var(--cyan)");
+      setTimeout(() => addLog("💎 src/core/ml_cli.py | 138 Lines | 🛡️ PURE", "var(--acid)"), 400);
+      setTimeout(() => addLog("💎 src/interface/manifold_ui.html | 420 Lines | 🛡️ PURE", "var(--acid)"), 800);
+      setTimeout(() => addLog("✅ Resonance Verified. Consistency ◦A Maintained.", "var(--cyan)"), 1200);
+    } 
+    else if (cmd.startsWith("gemini search:")) {
+      const query = cmd.substring(14).trim();
+      addLog(`Connecting to Oracle Node for: "${query}"`, "var(--magenta)");
+      oracleContent.innerHTML = `<div class="pulse" style="color:var(--cyan); text-align:center; margin-top:50px;">≋ TUNING FREQUENCY... ≋</div>`;
+      
+      try {
+        const res = await fetch("http://127.0.0.1:8080/api/gemini-search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: query })
+        });
+        const data = await res.json();
+        const responseText = data.results[0].snippet;
+        oracleContent.innerHTML = `<div style="color:var(--cyan); margin-bottom:10px; font-weight:bold;">ORACLE RESPONSE:</div>${responseText}`;
+        addLog("Signal Received. Telemetry Updated.", "var(--acid)");
+      } catch (e) {
+        addLog("CRITICAL: Bridge Failure. Is manifold_api.py running?", "var(--danger)");
+        oracleContent.innerHTML = `<div style="color:var(--danger); text-align:center; margin-top:50px;">[SIGNAL LOST]</div>`;
+      }
+    }
+  }
+
+  document.getElementById('cmd').addEventListener('keydown', (e) => { if (e.key === 'Enter') execute(); });
+  addLog("System Online. Tier 1 Sovereign Command Initialized.", "var(--cyan)");
+</script>
+</body>
+</html>
