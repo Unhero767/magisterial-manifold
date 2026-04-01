@@ -1,0 +1,9 @@
+{
+  "artifact_id": "BQE-01",
+  "name": "The Baseline Quantum Encoder",
+  "science": "Information Theory",
+  "math": "Baseline Algorithms",
+  "elements": ["Carbon (C)", "Lithium (Li)"],
+  "description": "Encodes quantum information on a 19.08 Hz baseline frequency for perfect cross-timeline transmission.",
+  "status": "INITIALIZED"
+}
