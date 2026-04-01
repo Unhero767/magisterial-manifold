@@ -1,0 +1,10 @@
+{
+  "material_id": "01",
+  "name": "NanoFlex Carbonfoam",
+  "properties": {
+    "density": "low",
+    "structural_integrity": "high-lattice",
+    "thermal_dissipation": "ThermoGlow-ready"
+  },
+  "integration": "Artifact Grade"
+}
