@@ -1,0 +1,12 @@
+{
+  "material_id": "02",
+  "name": "ThermoGlow Fabric",
+  "properties": {
+    "thermal_absorption": "ultra-high",
+    "luminescence_output": "bruise-violet-spectrum",
+    "kinetic_conversion": "active",
+    "loop_coupling": "Pigment-Anchor-01"
+  },
+  "integration_status": "Bonded to NanoFlex (ID: 01)",
+  "state": "LUMINOUS"
+}
