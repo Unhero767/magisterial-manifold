@@ -1,0 +1,12 @@
+{
+  "artifact_id": "VWA-09",
+  "name": "Void-Wraith Aegis",
+  "mechanics": [
+    "Zero_Stasis_Lock",
+    "Solipsistic_Neural_Void",
+    "Entropy_Nullification",
+    "Temporal_Erasure"
+  ],
+  "operational_state": "MAX_ISOLATION",
+  "status": "POLAR_OPPOSITE_MANIFESTED"
+}
