@@ -1,0 +1,1 @@
+"""Magisterial Manifold - Core modules"""
