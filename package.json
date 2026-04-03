@@ -1,0 +1,26 @@
+{
+  "name": "magisterialmanifold",
+  "version": "1.0.0",
+  "description": "Welcome to the **Core Sector** of the Magisterial Manifold. This repository is a neuro-integrated architecture designed to bridge the gap between human intent and machine logic.",
+  "homepage": "https://github.com/Unhero767/magisterial-manifold#readme",
+  "bugs": {
+    "url": "https://github.com/Unhero767/magisterial-manifold/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Unhero767/magisterial-manifold.git"
+  },
+  "license": "ISC",
+  "author": "Ken Dallmier",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.9",
+    "typescript": "^6.0.2"
+  }
+}
