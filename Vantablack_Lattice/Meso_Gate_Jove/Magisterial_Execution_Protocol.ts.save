@@ -1,0 +1,5 @@
+çts-node Magisterial_Execution_Protocol.ts --init-root
+# or compile first with tsc
+tsc Magisterial_Execution_Protocol.ts
+node Magisterial_Execution_Protocol.js --init-root
+

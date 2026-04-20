@@ -1,0 +1,6 @@
+{
+  "dimensions": 18,
+  "inertia_target": 0.0382,
+  "friction_limit": 0.04,
+  "state": "PLASMA_READY"
+}
