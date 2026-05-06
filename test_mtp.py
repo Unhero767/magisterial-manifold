@@ -1,9 +1,13 @@
+# This is a standalone test script, not a pytest test file
+# Run it directly with: python test_mtp.py
+# (Do not include in pytest collection)
+
 from src.core.rule_engine import RuleEngine
 
 def ritual_log(protocol, message):
     print(f"[{protocol.upper()}] {message}")
 
-def test_mtp_resonance():
+def mtp_resonance():
     engine = RuleEngine()
     intent_int = {'return_type': "<class 'int'>"}
 
@@ -18,4 +22,4 @@ def test_mtp_resonance():
         print(f"❌ UNEXPECTED ERROR: {e}")
 
 if __name__ == "__main__":
-    test_mtp_resonance()
+    mtp_resonance()
