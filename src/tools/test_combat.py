@@ -13,4 +13,6 @@ card = LogicFragmentCard()
 storm.erode(veil)
 
 # 3. Aurelia-9 Counters with the Fragment
-print(card.execute(veil, engine))
+# Call execute() with correct argument count
+result = card.execute(veil)
+print(result)
