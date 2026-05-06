@@ -1,5 +1,5 @@
 import pytest
-from core.sovereign_unit import (
+from .sovereign_unit import (
     SovereignUnitError,
     require_nonempty_str,
     require_mapping,
@@ -32,7 +32,7 @@ def test_seal_validate_pass():
     seal.validate()  # Should not raise
 
 def test_seal_validate_fail():
-    from core.sovereign_unit import Seal
+    from .sovereign_unit import Seal
     seal = Seal(unit="", version="0.1.0")
     with pytest.raises(SovereignUnitError):
         seal.validate()
