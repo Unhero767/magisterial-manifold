@@ -1,5 +1,11 @@
 import pytest
-from .sovereign_unit import (
+import sys
+import os
+
+# Add the root directory to path for absolute imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from core.sovereign_unit import (
     SovereignUnitError,
     require_nonempty_str,
     require_mapping,
@@ -32,7 +38,7 @@ def test_seal_validate_pass():
     seal.validate()  # Should not raise
 
 def test_seal_validate_fail():
-    from .sovereign_unit import Seal
+    from core.sovereign_unit import Seal
     seal = Seal(unit="", version="0.1.0")
     with pytest.raises(SovereignUnitError):
         seal.validate()
