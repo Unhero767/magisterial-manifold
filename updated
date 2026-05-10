@@ -1,0 +1,436 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
+import { getFirestore, doc, setDoc } from 'firebase/firestore'; 
+import { AlertTriangle, User, Zap, BookOpen, Crown, Shield, Globe } from 'lucide-react';
+
+// --- Environment Variables (Provided by Canvas) ---
+// Note: These variables are provided by the canvas environment for Firebase setup.
+const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+// --- Static D&D Data (Game Rules - Stored Locally) ---
+const RACES = ['Human', 'Elf', 'Dwarf', 'Halfling', 'Dragonborn', 'Gnome', 'Tiefling'];
+const CLASSES = ['Fighter', 'Wizard', 'Rogue', 'Cleric', 'Bard', 'Paladin'];
+const SUBCLASSES_BY_CLASS = {
+    Fighter: ['Battle Master', 'Champion', 'Eldritch Knight'],
+    Wizard: ['School of Abjuration', 'School of Evocation', 'School of Necromancy'],
+    Rogue: ['Thief', 'Assassin', 'Arcane Trickster'],
+    Cleric: ['Life Domain', 'Light Domain', 'Trickery Domain'],
+    Bard: ['College of Lore', 'College of Valor'],
+    Paladin: ['Oath of Devotion', 'Oath of Vengeance'],
+};
+const ALIGNMENTS = ['Lawful Good', 'Neutral Good', 'Chaotic Good', 'Lawful Neutral', 'True Neutral', 'Chaotic Neutral', 'Lawful Evil', 'Neutral Evil', 'Chaotic Evil'];
+const JOBS = ['Blacksmith', 'Scribe', 'Baker', 'Farmer', 'Innkeeper', 'Guard', 'Hunter', 'Sailor', 'Apprentice'];
+const LIFE_EVENTS = ['Orphaned', 'Royal Pardon', 'Disgraced', 'Found Hidden Artifact', 'Survived a Cult Attack', 'Witnessed a Prophecy', 'Survived a Dragon Attack'];
+
+// Aesthetic/Cosmetic Data for the 'Looks' Section
+const GENDERS = ['Female', 'Male', 'Non-binary', 'Genderfluid', 'Prefer not to say'];
+const HAIR_COLORS = ['Black', 'Brown', 'Blonde', 'Red', 'White', 'Blue', 'Green', 'Purple'];
+const EYE_COLORS = ['Brown', 'Blue', 'Green', 'Hazel', 'Silver', 'Gold', 'Black'];
+const SKIN_TONES = ['Pale', 'Fair', 'Tanned', 'Olive', 'Brown', 'Dark Brown', 'Black'];
+
+
+/**
+ * Reusable Dropdown Select Component
+ * @param {object} props
+ */
+const SelectInput = ({ label, value, onChange, options, icon: Icon, required = false }) => (
+    <div className="flex flex-col space-y-2">
+        <label className="text-sm font-semibold text-gray-700 flex items-center">
+            {Icon && <Icon className="w-4 h-4 mr-2 text-indigo-500" />}
+            {label} {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+        <select
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            className="p-3 border border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 ease-in-out bg-white appearance-none"
+            required={required}
+        >
+            <option value="" disabled>Select {label}</option>
+            {options.map(option => (
+                <option key={option} value={option}>
+                    {option}
+                </option>
+            ))}
+        </select>
+    </div>
+);
+
+/**
+ * App component: Main Character Creator
+ */
+const App = () => {
+    const [db, setDb] = useState(null);
+    const [auth, setAuth] = useState(null);
+    const [userId, setUserId] = useState(null);
+    const [isAuthReady, setIsAuthReady] = useState(false);
+    const [firestoreMessage, setFirestoreMessage] = useState('');
+    const [isSaving, setIsSaving] = useState(false);
+
+    // --- Core Character State ---
+    const [character, setCharacter] = useState({
+        name: '',
+        // The 7 requested fields + Name
+        race: '',
+        class: '',
+        job: '',
+        subclass: '',
+        lifeEvent: '',
+        alignment: '',
+        looks: {
+            gender: '',
+            hairColor: '',
+            eyeColor: '',
+            skinTone: '',
+            height: '',
+            weight: '',
+        }
+    });
+
+    const updateCharacter = useCallback((key, value) => {
+        setCharacter(prev => {
+            if (key === 'class' && value !== prev.class) {
+                // Reset subclass if class changes
+                return { ...prev, class: value, subclass: '' };
+            }
+            return { ...prev, [key]: value };
+        });
+    }, []);
+
+    const updateLooks = useCallback((key, value) => {
+        setCharacter(prev => ({
+            ...prev,
+            looks: {
+                ...prev.looks,
+                [key]: value
+            }
+        }));
+    }, []);
+
+    // Available subclasses based on selected class
+    const availableSubclasses = useMemo(() => {
+        return character.class ? SUBCLASSES_BY_CLASS[character.class] || [] : [];
+    }, [character.class]);
+
+
+    // --- Firebase Initialization and Authentication ---
+    useEffect(() => {
+        const initializeFirebase = async () => {
+            try {
+                const firebaseApp = initializeApp(firebaseConfig);
+                const authInstance = getAuth(firebaseApp);
+                const dbInstance = getFirestore(firebaseApp);
+                
+                // Set Firebase instances
+                setDb(dbInstance);
+                setAuth(authInstance);
+
+                // Authentication
+                const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : '';
+                
+                if (initialAuthToken) {
+                    await signInWithCustomToken(authInstance, initialAuthToken);
+                } else {
+                    await signInAnonymously(authInstance);
+                }
+
+                // Listen for Auth State Change
+                const unsubscribe = authInstance.onAuthStateChanged(user => {
+                    if (user) {
+                        setUserId(user.uid);
+                    } else {
+                        // This should ideally not happen if initial sign-in is successful
+                        setUserId('anonymous');
+                    }
+                    setIsAuthReady(true);
+                });
+
+                // Clean up the subscription
+                return () => unsubscribe();
+
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                setFirestoreMessage("Error initializing Firebase. Check console for details.");
+                setIsAuthReady(true); 
+            }
+        };
+
+        if (Object.keys(firebaseConfig).length > 0 && !isAuthReady) {
+            initializeFirebase();
+        } else if (!isAuthReady) {
+             // Fallback if config is missing (for local testing without Canvas vars)
+            setFirestoreMessage("Firebase configuration missing. Data will not save.");
+            setIsAuthReady(true);
+        }
+    }, [isAuthReady]); 
+
+
+    // --- Firestore Logic ---
+
+    // Utility for exponential backoff retry on API calls
+    const retryFetch = async (url, options, maxRetries = 5) => {
+        let lastError = null;
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response;
+            } catch (error) {
+                lastError = error;
+                const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                console.warn(`Retry ${i + 1}/${maxRetries} after ${delay.toFixed(0)}ms:`, error.message);
+                if (i < maxRetries - 1) await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+        throw lastError;
+    };
+
+    const saveCharacter = useCallback(async (currentCharacter) => {
+        if (!db || !userId) {
+            setFirestoreMessage("Database not ready or User not signed in.");
+            return;
+        }
+
+        setIsSaving(true);
+        setFirestoreMessage('');
+        
+        // Path: /artifacts/{appId}/users/{userId}/characters/{documentId}
+        const characterDocRef = doc(db, 'artifacts', appId, 'users', userId, 'characters', 'current_sheet');
+
+        try {
+            await setDoc(characterDocRef, { 
+                ...currentCharacter,
+                lastUpdated: new Date().toISOString()
+            });
+            setFirestoreMessage("Character Sheet saved successfully!");
+        } catch (error) {
+            console.error("Error writing document:", error);
+            setFirestoreMessage(`Error saving character: ${error.message}`);
+        } finally {
+            setIsSaving(false);
+            // Clear message after a few seconds
+            setTimeout(() => setFirestoreMessage(''), 5000);
+        }
+    }, [db, userId]);
+
+    // Save when character state changes (debounced saving is better, but immediate save for simplicity)
+    useEffect(() => {
+        if (isAuthReady && userId && character.name) {
+            saveCharacter(character);
+        }
+    }, [character, isAuthReady, userId, saveCharacter]);
+
+
+    // --- Loading State UI ---
+    if (!isAuthReady) {
+        return (
+            <div className="flex justify-center items-center min-h-screen bg-gray-50 font-inter">
+                <style>{` .font-inter { font-family: 'Inter', sans-serif; } `}</style>
+                <div className="text-center p-8 bg-white rounded-xl shadow-lg">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                    <p className="text-gray-700 font-medium">Initializing Heroic Destiny...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // --- Main Application UI ---
+    return (
+        <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8 font-inter">
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>{` 
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+                .font-inter { font-family: 'Inter', sans-serif; } 
+                select { background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%20173.5c-4.2%204.2-11%204.2-15.2%200L146.2%2057.4%2020.6%20173.5c-4.2%204.2-11%204.2-15.2%200-4.2-4.2-4.2-11%200-15.2L138.6%2042.2c4.2-4.2%2011-4.2%2015.2%200L287%20158.3c4.2%204.2%204.2%2011%200%2015.2z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 0.7rem center; background-size: 0.65em auto; }
+            `}</style>
+            
+            <div className="max-w-4xl mx-auto">
+                <header className="text-center mb-10">
+                    <h1 className="text-5xl font-extrabold text-gray-900 mb-2 tracking-tight">
+                        Hero Destiny Selector
+                    </h1>
+                    <p className="text-xl text-gray-500">
+                        Finalize your character's race, class, and cosmic alignment.
+                    </p>
+                    <p className="text-xs text-indigo-600 mt-3 font-mono">
+                        User ID: {userId} | App ID: {appId}
+                    </p>
+                </header>
+
+                {/* Firestore Message / Status */}
+                {firestoreMessage && (
+                    <div className={`p-3 mb-6 rounded-lg font-medium text-sm transition duration-300 ${
+                        firestoreMessage.includes('Error') 
+                            ? 'bg-red-100 text-red-700 border border-red-300' 
+                            : 'bg-green-100 text-green-700 border border-green-300'
+                    } flex items-center`}>
+                        <AlertTriangle className="w-4 h-4 mr-2" />
+                        {firestoreMessage}
+                    </div>
+                )}
+                
+                {isSaving && (
+                    <div className="flex items-center justify-center p-3 mb-6 rounded-lg bg-indigo-50 text-indigo-700 font-medium text-sm">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-indigo-500 mr-3"></div>
+                        Saving changes to the Chronoscroll...
+                    </div>
+                )}
+
+                <main className="space-y-8">
+                    {/* Character Name */}
+                    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl border-t-4 border-indigo-500">
+                        <h2 className="text-2xl font-bold mb-4 text-gray-800 flex items-center">
+                            <User className="w-6 h-6 mr-3 text-indigo-600"/>
+                            Character Identity
+                        </h2>
+                        <input
+                            type="text"
+                            placeholder="Enter Character Name (e.g., Elara Duskbringer)"
+                            value={character.name}
+                            onChange={(e) => updateCharacter('name', e.target.value)}
+                            className="w-full p-4 text-lg border border-gray-300 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+                            required
+                        />
+                        {!character.name && (
+                            <p className="text-red-500 text-sm mt-2">A name is required to save your character!</p>
+                        )}
+                    </div>
+
+                    {/* Core Mechanics: Race, Class, Subclass, Alignment */}
+                    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+                        <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                            <Shield className="w-6 h-6 mr-3 text-indigo-600"/>
+                            The Core Matrix
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <SelectInput 
+                                label="Race" 
+                                value={character.race} 
+                                onChange={(val) => updateCharacter('race', val)} 
+                                options={RACES} 
+                                icon={Crown}
+                                required
+                            />
+                            <SelectInput 
+                                label="Alignment" 
+                                value={character.alignment} 
+                                onChange={(val) => updateCharacter('alignment', val)} 
+                                options={ALIGNMENTS} 
+                                icon={Globe}
+                                required
+                            />
+                            <SelectInput 
+                                label="Class" 
+                                value={character.class} 
+                                onChange={(val) => updateCharacter('class', val)} 
+                                options={CLASSES} 
+                                icon={Zap}
+                                required
+                            />
+                            <SelectInput 
+                                label="Subclass" 
+                                value={character.subclass} 
+                                onChange={(val) => updateCharacter('subclass', val)} 
+                                options={availableSubclasses} 
+                                icon={BookOpen}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    {/* Narrative & Aesthetics: Job, Life Event, Looks */}
+                    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+                        <h2 className="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                            <BookOpen className="w-6 h-6 mr-3 text-indigo-600"/>
+                            Narrative & Appearance
+                        </h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <SelectInput 
+                                label="Prior Job/Profession" 
+                                value={character.job} 
+                                onChange={(val) => updateCharacter('job', val)} 
+                                options={JOBS} 
+                                icon={BookOpen}
+                            />
+                            <SelectInput 
+                                label="Major Life Event" 
+                                value={character.lifeEvent} 
+                                onChange={(val) => updateCharacter('lifeEvent', val)} 
+                                options={LIFE_EVENTS} 
+                                icon={BookOpen}
+                            />
+                        </div>
+
+                        <h3 className="text-xl font-semibold mb-4 text-gray-700 border-t pt-4">Aesthetic Customization (Looks)</h3>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {/* Looks Dropdowns */}
+                            <SelectInput 
+                                label="Gender Identity" 
+                                value={character.looks.gender} 
+                                onChange={(val) => updateLooks('gender', val)} 
+                                options={GENDERS}
+                            />
+                            <SelectInput 
+                                label="Hair Color" 
+                                value={character.looks.hairColor} 
+                                onChange={(val) => updateLooks('hairColor', val)} 
+                                options={HAIR_COLORS}
+                            />
+                            <SelectInput 
+                                label="Eye Color" 
+                                value={character.looks.eyeColor} 
+                                onChange={(val) => updateLooks('eyeColor', val)} 
+                                options={EYE_COLORS}
+                            />
+                            <SelectInput 
+                                label="Skin Tone" 
+                                value={character.looks.skinTone} 
+                                onChange={(val) => updateLooks('skinTone', val)} 
+                                options={SKIN_TONES}
+                            />
+
+                            {/* Looks Inputs */}
+                            <div className="flex flex-col space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Height (e.g., 5' 10")</label>
+                                <input
+                                    type="text"
+                                    placeholder="Height"
+                                    value={character.looks.height}
+                                    onChange={(e) => updateLooks('height', e.target.value)}
+                                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Weight (e.g., 180 lbs)</label>
+                                <input
+                                    type="text"
+                                    placeholder="Weight"
+                                    value={character.looks.weight}
+                                    onChange={(e) => updateLooks('weight', e.target.value)}
+                                    className="p-3 border border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            
+            {/* Footer Summary (Always visible) */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl p-4 mt-10">
+                <div className="max-w-4xl mx-auto text-sm text-gray-600 flex flex-wrap gap-x-4">
+                    <span className="font-bold">Summary:</span>
+                    <span><strong className="text-indigo-600">Name:</strong> {character.name || '...'}</span>
+                    <span><strong className="text-indigo-600">Race:</strong> {character.race || '...'}</span>
+                    <span><strong className="text-indigo-600">Class:</strong> {character.class || '...'}</span>
+                    <span><strong className="text-indigo-600">Subclass:</strong> {character.subclass || '...'}</span>
+                    <span><strong className="text-indigo-600">Alignment:</strong> {character.alignment || '...'}</span>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default App;
