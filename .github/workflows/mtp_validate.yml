@@ -1,4 +1,4 @@
-name: 🛡️ MTP Validation Gate
+name: 🎉 MTP Validation Gate
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - name: 🛠️ Clone Manifold
+      - name: 🚀 Clone Manifold
         uses: actions/checkout@v4
 
       - name: 🐍 Initialize Python Environment
@@ -29,4 +29,4 @@ jobs:
       - name: 🧪 Execute MTP Resonance Test
         run: |
           # The RuleEngine uses inherent semantic richness to verify integrity
-          python3 test_mtp.py tests/
+          python3 tests/test_mtp.py
