@@ -13,6 +13,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Run tests
+        env:
+          GEMINI_API_KEY: ""
+          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+        run: |
+          # Only target the directory where your actual tests reside
+          pytest -q tests/
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
