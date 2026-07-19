@@ -1,2 +1,38 @@
-Python 3.15.0a5 (v3.15.0a5:d51cc01c197, Jan 14 2026, 10:47:57) [Clang 17.0.0 (clang-1700.6.3.2)] on darwin
-Enter "help" below or click "Help" above for more information.
+import pytest
+from core.sovereign_unit import (
+    SovereignUnitError,
+    require_nonempty_str,
+    require_mapping,
+    Seal,
+)
+
+def test_require_nonempty_str_valid():
+    assert require_nonempty_str("hello") == "hello"
+    assert require_nonempty_str(" trimmed ") == "trimmed"
+
+def test_require_nonempty_str_invalid():
+    with pytest.raises(SovereignUnitError):
+        require_nonempty_str("")
+    with pytest.raises(SovereignUnitError):
+        require_nonempty_str(" ")
+    with pytest.raises(SovereignUnitError):
+        require_nonempty_str(None)
+
+def test_require_mapping_valid():
+    assert require_mapping({"key": "value"}) == {"key": "value"}
+
+def test_require_mapping_invalid():
+    with pytest.raises(SovereignUnitError):
+        require_mapping("not a mapping")
+    with pytest.raises(SovereignUnitError):
+        require_mapping(123)
+
+def test_test_seal_validate_pass():
+    seal = Seal(unit="UNHERO767::MANIFOLD::SOVEREIGN_UNIT", version="0.1.0")
+    seal.validate() # Should not raise
+
+def test_seal_validate_fail():
+    from core.sovereign_unit import Seal
+    seal = Seal(unit="", version="0.1.0")
+    with pytest.raises(SovereignUnitError):
+        seal.validate()
